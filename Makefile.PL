@@ -8,13 +8,8 @@ license 'perl';
 perl_version '5.006001';
 all_from 'lib/Data/Currency.pm';
 
-requires 'Class::Accessor::Grouped' => '0.03';
-requires 'Class::Inspector'         => '0';
-requires 'Finance::Currency::Convert::WebserviceX' => '0.03';
-requires 'Locale::Currency::Format' => '1.22';
-requires 'Scalar::Util'             => '0';
-
 requires 'Locale::Currency'         => '2.07';
+requires 'Locale::Currency::Format' => '1.22';
 requires 'Moose';
 requires 'MooseX::Types';
 requires 'Math::BigFloat';
