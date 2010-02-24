@@ -1,104 +1,150 @@
-# $Id$
 package Data::Currency;
 use strict;
 use warnings;
+use Moose;
+
 use overload
     '0+'     => sub {shift->value},
     'bool'   => sub {shift->value},
     '""'     => sub {shift->stringify},
     fallback => 1;
-use vars qw/$VERSION/;
 
+use vars qw/$VERSION/;
 $VERSION = '0.04002';
 
-BEGIN {
-    use base qw/Class::Accessor::Grouped/;
-    use Locale::Currency ();
-    use Locale::Currency::Format;
-    use Scalar::Util ();
-    use Class::Inspector ();
-    use Carp;
+use Data::Currency::Types qw(CurrencyCode Format);
+use MooseX::Types::Moose qw(HashRef);
+use Locale::Currency;
+use Locale::Currency::Format;
+use Scalar::Util;
+use Carp;
 
-    __PACKAGE__->mk_group_accessors('inherited', qw/
-        format value converter converter_class
-    /);
-    __PACKAGE__->mk_group_accessors('component_class', qw/converter_class/);
-};
+has code => (
+    is => 'rw',
+    isa => CurrencyCode,
+    default => 'USD'
+);
+has converter => (
+    is => 'rw',
+);
+has converter_class => (
+    is => 'rw',
+    isa => 'Str',
+    default => 'Finance::Currency::Convert::WebserviceX'
+);
+has format => (
+    is => 'rw',
+    isa => Format,
+    default => 'FMT_COMMON'
+);
+has value => (
+    is => 'rw',
+    isa => 'Num',
+    default => 0
+);
 
-__PACKAGE__->converter_class('Finance::Currency::Convert::WebserviceX');
-__PACKAGE__->value(0);
-__PACKAGE__->code('USD');
-__PACKAGE__->format('FMT_COMMON');
+sub BUILDARGS {
+    my ($class, @args) = @_;
 
-my %codes;
+    if(@args == 1 && (!is_HashRef($args[0]))) {
+        return { value => $args[0] };
+    } elsif(scalar(@args) % 2 == 0) {
+        return { @args };
+    } elsif(scalar(@args) % 3 == 0) {
+        return { value => $args[0], code => $args[1], format => $args[2] };
+    }
 
-sub new {
-    my ($class, $value, $code, $format) = @_;
-    my $self = bless {}, $class;
+    return $args[0];
+}
 
-    if (ref $value eq 'HASH') {
-        foreach my $key (keys %{$value}) {
-            $self->$key($value->{$key}) if defined $value->{$key};
-        };
-    } else {
-        if (defined $value){
-            $self->value($value)
-        };
-        if ($code) {
-            $self->code($code)
-        };
-        if ($format) {
-            $self->format($format)
-        };
-    };
+# BEGIN {
+    # use base qw/Class::Accessor::Grouped/;
+    # use Locale::Currency ();
+    # use Locale::Currency::Format;
+    # use Scalar::Util ();
+    # use Class::Inspector ();
+    # use Carp;
 
-    return $self;
-};
+    # __PACKAGE__->mk_group_accessors('inherited', qw/
+    #     format value converter converter_class
+    # /);
+    # __PACKAGE__->mk_group_accessors('component_class', qw/converter_class/);
+# };
 
-sub code {
-    my $self = shift;
+# __PACKAGE__->converter_class('Finance::Currency::Convert::WebserviceX');
+# __PACKAGE__->value(0);
+# __PACKAGE__->code('USD');
+# __PACKAGE__->format('FMT_COMMON');
 
-    if (scalar @_) {
-        my $code = shift;
+# my %codes;
 
-        croak "Invalid currency code: $code"
-            unless _is_currency_code($code);
+# sub new {
+#     my ($class, $value, $code, $format) = @_;
+#     my $self = bless {}, $class;
+# 
+#     if (ref $value eq 'HASH') {
+#         foreach my $key (keys %{$value}) {
+#             $self->$key($value->{$key}) if defined $value->{$key};
+#         };
+#     } else {
+#         if (defined $value){
+#             $self->value($value)
+#         };
+#         if ($code) {
+#             $self->code($code)
+#         };
+#         if ($format) {
+#             $self->format($format)
+#         };
+#     };
+# 
+#     return $self;
+# };
 
-        $self->set_inherited('code', $code);
-    };
+# sub code {
+#     my $self = shift;
+# 
+#     if (scalar @_) {
+#         my $code = shift;
+# 
+#         croak "Invalid currency code: $code"
+#             unless _is_currency_code($code);
+# 
+#         $self->set_inherited('code', $code);
+#     };
+# 
+#     return $self->get_inherited('code');
+# };
 
-    return $self->get_inherited('code');
-};
-
-sub convert {
-    my ($self, $to) = @_;
-    my $class = Scalar::Util::blessed($self);
-    my $from = $self->code;
-
-    $to ||= '';
-    if (uc($from) eq uc($to)) {
-        return $self;
-    };
-
-    croak 'Invalid currency code source: ' . ($from || 'undef')
-        unless _is_currency_code($from);
-
-    croak 'Invalid currency code target: ' . ($to || 'undef')
-        unless _is_currency_code($to);
-
-    if (!$self->converter) {
-        $self->converter($self->converter_class->new)
-    };
-
-    return $class->new(
-        $self->converter->convert($self->value, $from, $to) || 0,
-        $to,
-        $self->format
-    );
-};
+# sub convert {
+#     my ($self, $to) = @_;
+#     my $class = Scalar::Util::blessed($self);
+#     my $from = $self->code;
+# 
+#     $to ||= '';
+#     if (uc($from) eq uc($to)) {
+#         return $self;
+#     };
+# 
+#     croak 'Invalid currency code source: ' . ($from || 'undef')
+#         unless is_CurrencyCode($from);
+# 
+#     croak 'Invalid currency code target: ' . ($to || 'undef')
+#         unless is_CurrencyCode($to);
+# 
+#     if (!$self->converter) {
+#         $self->converter($self->converter_class->new)
+#     };
+# 
+#     return $class->new(
+#         $self->converter->convert($self->value, $from, $to) || 0,
+#         $to,
+#         $self->format
+#     );
+# };
 
 sub name {
-    my $self = shift;
+    my ($self) = @_;
     my $name = Locale::Currency::code2currency($self->code);
 
     ## Fix for older Locale::Currency w/mispelled Candian
@@ -123,23 +169,23 @@ sub stringify {
     eval '$format = Locale::Currency::Format::' .  $format;
 
     croak 'Invalid currency code:  ' . ($code || 'undef')
-        unless _is_currency_code($code);
+        unless is_CurrencyCode($code);
 
     return _to_utf8(
         Locale::Currency::Format::currency_format($code, $value, $format)
     );
 };
 
-sub _is_currency_code {
-    my $value = defined $_[0] ? uc(shift) : '';
-
-    return unless ($value =~ /^[A-Z]{3}$/);
-
-    if (! keys %codes) {
-        %codes = map {uc($_) => uc($_)} Locale::Currency::all_currency_codes();
-    };
-    return exists $codes{$value};
-};
+# sub _is_currency_code {
+#     my $value = defined $_[0] ? uc(shift) : '';
+# 
+#     return unless ($value =~ /^[A-Z]{3}$/);
+# 
+#     if (! keys %codes) {
+#         %codes = map {uc($_) => uc($_)} Locale::Currency::all_currency_codes();
+#     };
+#     return exists $codes{$value};
+# };
 
 sub _to_utf8 {
     my $value = shift;
@@ -152,27 +198,27 @@ sub _to_utf8 {
     return $value;
 };
 
-sub get_component_class {
-    my ($self, $field) = @_;
-
-    return $self->get_inherited($field);
-};
-
-sub set_component_class {
-    my ($self, $field, $value) = @_;
-
-    if ($value) {
-        if (!Class::Inspector->loaded($value)) {
-            eval "use $value";
-
-            croak "The $field $value could not be loaded: $@" if $@;
-        };
-    };
-
-    $self->set_inherited($field, $value);
-
-    return;
-};
+# sub get_component_class {
+#     my ($self, $field) = @_;
+# 
+#     return $self->get_inherited($field);
+# };
+# 
+# sub set_component_class {
+#     my ($self, $field, $value) = @_;
+# 
+#     if ($value) {
+#         if (!Class::Inspector->loaded($value)) {
+#             eval "use $value";
+# 
+#             croak "The $field $value could not be loaded: $@" if $@;
+#         };
+#     };
+# 
+#     $self->set_inherited($field, $value);
+# 
+#     return;
+# };
 
 1;
 __END__
