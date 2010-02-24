@@ -45,7 +45,6 @@ BEGIN {
     is($currency->code, 'USD', 'code is set');
     is($currency->format, 'FMT_COMMON', 'format is not set');
     is($currency->name, 'US Dollar', 'got name');
-    is($currency->converter, undef, 'converter no defined');
 };
 
 
@@ -92,7 +91,6 @@ BEGIN {
     is($currency->code, 'USD', 'code is set');
     is($currency->format, 'FMT_COMMON', 'format is not set');
     is($currency->name, 'US Dollar', 'got name');
-    is($currency->converter, undef, 'converter not defined');
 };
 
 
@@ -105,19 +103,17 @@ BEGIN {
     is($currency->code, 'USD', 'code is set');
     is($currency->format, 'FMT_COMMON', 'format is set');
     is($currency->name, 'US Dollar', 'got name');
-    is($currency->converter, undef, 'converter no defined');
 };
 
 
 ## create new with code/format
 {
-    my $currency = Data::Currency->new(1.23, 'CAD', 'FMT_STANDARD');
+    my $currency = Data::Currency->new(value => 1.23, code => 'CAD', format => 'FMT_STANDARD');
     isa_ok($currency, 'Data::Currency');
     is($currency->value, 1.23, 'value was set');
     is($currency->stringify, '1.23 CAD', 'stringify to string');
     is($currency->code, 'CAD', 'code was set');
     is($currency->format, 'FMT_STANDARD', 'format was set');
-    is($currency->converter, undef, 'converter not defined');
 };
 
 
@@ -133,7 +129,6 @@ BEGIN {
     is($currency->stringify, '1.23 CAD', 'stringify to string');
     is($currency->code, 'CAD', 'code was set');
     is($currency->format, 'FMT_STANDARD', 'format was set');
-    is($currency->converter, undef, 'converter not defined');
 };
 
 ## croak when bad currency code is set in new
@@ -152,7 +147,6 @@ BEGIN {
     is($currency->value, 1.23, 'value was set');
     is($currency->stringify, '$1.23', 'stringify to string');
     is($currency->code, 'USD', 'code is set');
-    is($currency->converter, undef, 'converter no defined');
 
     $currency->code('CAD');
     is($currency->code, 'CAD', 'code set');

@@ -1,5 +1,11 @@
 Revision history for Data::Currency
 
+    - Switched from Class::Accessor* to Moose
+    - Removed converter functionality, see Data::Currency::Converter
+    - Constructor understands new($value), but nothing else.  Use a hashref.
+    - You can no longer set many of the attributes to undef
+    - You can no longer use class-level methods to specify defaults
+
     - Changed prereq back to 5.6.1
 
 0.04002 Fri May 04 21:43:14 2007

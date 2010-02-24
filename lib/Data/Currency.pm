@@ -41,8 +41,6 @@ sub BUILDARGS {
         return { value => $args[0] };
     } elsif(scalar(@args) % 2 == 0) {
         return { @args };
-    } elsif(scalar(@args) % 3 == 0) {
-        return { value => $args[0], code => $args[1], format => $args[2] };
     }
 
     return $args[0];
