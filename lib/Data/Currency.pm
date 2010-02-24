@@ -3,14 +3,16 @@ use strict;
 use warnings;
 use Moose;
 
+use vars qw/$VERSION/;
+$VERSION = '0.04002';
+
+with qw(MooseX::Clone);
+
 use overload
     '0+'     => sub {shift->value},
     'bool'   => sub {shift->value},
     '""'     => sub {shift->stringify},
     fallback => 1;
-
-use vars qw/$VERSION/;
-$VERSION = '0.04002';
 
 use Data::Currency::Types qw(CurrencyCode Format);
 use MooseX::Types::Moose qw(HashRef);
@@ -175,6 +177,13 @@ currency code is set the method will die.
 Returns the original price value given to C<new>.
 
 =head1 METHODS
+
+=head2 clone(%params)
+
+Clone this Data::Currency object and creates a new one.  You may optionally
+specify some of the attributes to overwrite.
+
+  $curr->clone({ value => 100 }); # Clones all fields but changes value to 100
 
 =head2 stringify
 

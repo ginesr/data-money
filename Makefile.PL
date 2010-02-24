@@ -11,6 +11,7 @@ all_from 'lib/Data/Currency.pm';
 requires 'Locale::Currency'         => '2.07';
 requires 'Locale::Currency::Format' => '1.22';
 requires 'Moose';
+requires 'MooseX::Clone';
 requires 'MooseX::Types';
 requires 'Math::BigFloat';
 
