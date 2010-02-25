@@ -8,13 +8,18 @@ $VERSION = '0.04002';
 
 with qw(MooseX::Clone);
 
+use Math::BigFloat;
+
 use overload
-    '0+'     => sub {shift->value},
-    'bool'   => sub {shift->value},
-    '""'     => sub {shift->stringify},
+    '+'     => sub { $_[0]->clone( value => $_[0]->value->copy->badd($_[1]) ) },
+    '-'     => sub { my $c = $_[0]->value->copy; $_[2] ? $c->bneg()->badd( $_[1]) : $c->bsub( $_[1]); return $_[0]->clone(value => $c)},
+    '*'     => sub { $_[0]->clone( value => $_[0]->value->copy->bmul($_[1]) ) },
+    '+='    => sub { $_[0]->clone( value => $_[0]->value->copy->badd($_[1]) ) },
+    '-='    => sub { $_[0]->clone( value => $_[0]->value->copy->bsub($_[1]) ) },
+    '""'    => sub { shift->stringify },
     fallback => 1;
 
-use Data::Currency::Types qw(CurrencyCode Format);
+use Data::Currency::Types qw(Amount CurrencyCode Format);
 use MooseX::Types::Moose qw(HashRef);
 use Locale::Currency;
 use Locale::Currency::Format;
@@ -32,8 +37,9 @@ has format => (
 );
 has value => (
     is => 'rw',
-    isa => 'Num',
-    default => 0
+    isa => Amount,
+    default => sub { Math::BigFloat->new(0) },
+    coerce => 1
 );
 
 sub BUILDARGS {
@@ -64,7 +70,6 @@ sub stringify {
     my $self = shift;
     my $format = shift || $self->format;
     my $code = $self->code;
-    my $value = $self->value;
 
     if (!$format) {
         $format = 'FMT_COMMON';
@@ -141,6 +146,18 @@ The Data::Currency module provides basic currency formatting:
 
 Each Data::Currency object will stringify to the original value except in string
 context, where it stringifies to the format specified in C<format>.
+
+=head1 OPERATOR OVERLOADING
+
+Data::Currency overloads the following operators:
+
+=over 4
+
+=item +
+
+=item -
+
+=item *
 
 =head1 CONSTRUCTOR
 
