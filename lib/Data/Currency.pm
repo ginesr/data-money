@@ -18,6 +18,7 @@ use overload
     '/'     => sub { $_[0]->clone(value => scalar($_[0]->value->copy->bdiv($_[1]))) },
     '+='    => \&add_in_place,
     '-='    => \&subtract_in_place,
+    '0+'    => sub { $_[0]->value->numify; },
     '""'    => sub { shift->stringify },
     fallback => 1;
 

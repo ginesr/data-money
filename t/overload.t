@@ -15,6 +15,18 @@ use Data::Currency;
     cmp_ok($curr3, 'eq', '$1.01', 'stringification');
 }
 
+# Numify
+{
+    my $curr1 = Data::Currency->new(value => 0.01);
+    my $curr2 = Data::Currency->new(value => 0.99);
+    my $curr3 = Data::Currency->new(value => 1.01);
+
+    cmp_ok($curr1, '==', 0.01, 'numification');
+    cmp_ok($curr2, '==', 0.99, 'numification');
+    cmp_ok($curr3, '==', 1.01, 'numification');
+}
+
+
 # Addition
 {
     my $curr1 = Data::Currency->new(value => 0.01);
