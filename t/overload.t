@@ -47,6 +47,16 @@ use Data::Currency;
     cmp_ok($curr2 * 2, 'eq', '$1.98', '* with number (over a dollar)');
 }
 
+# Multiplication
+{
+    my $curr1 = Data::Currency->new(value => 1.00);
+    my $curr2 = Data::Currency->new(value => 0.99);
+    my $curr3 = Data::Currency->new(value => 1.01);
+
+    cmp_ok($curr1 / 2, 'eq', '$0.50', '/ with number');
+    cmp_ok($curr2 / 2, 'eq', '$0.50', '/ with number rounding');
+}
+
 # +=
 {
     my $curr1 = Data::Currency->new(value => 0.01);

@@ -15,6 +15,7 @@ use overload
     '+'     => \&add,
     '-'     => \&subtract,
     '*'     => sub { $_[0]->clone(value => $_[0]->value->copy->bmul($_[1])) },
+    '/'     => sub { $_[0]->clone(value => scalar($_[0]->value->copy->bdiv($_[1]))) },
     '+='    => \&add_in_place,
    '-='     => \&subtract_in_place,
     '""'    => sub { shift->stringify },
@@ -192,17 +193,34 @@ context, where it stringifies to the format specified in C<format>.
 
 =head1 OPERATOR OVERLOADING
 
+Data::Currency overrides some operators.  It is important to note which
+operators change the object's value and which return new ones.  Addition and
+subtraction operators accept either a Data::Currency argument or a normal
+number via scalar.  Others expect only a number.
+
 Data::Currency overloads the following operators:
 
 =over 4
 
 =item +
 
-Handled the C<add> method.
+Handled by the C<add> method.  Returns a new Data::Currency object.
 
 =item -
 
+Handled by the C<subtract> method.  Returns a new Data::Currency object.
+
 =item *
+
+=item +=
+
+Handled by the C<add_in_place> method.  Modifies the left-hand object's value.
+Works with either a Data::Currency argument or a normal number.
+
+=item -=
+
+Handled by the C<subtract_in_place> method.  Modifies the left-hand object's value.
+Works with either a Data::Currency argument or a normal number.
 
 =head1 CONSTRUCTOR
 
