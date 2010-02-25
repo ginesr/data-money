@@ -77,9 +77,27 @@ sub stringify {
         unless is_CurrencyCode($code);
 
     return _to_utf8(
-        Locale::Currency::Format::currency_format($code, $value, $format)
+        Locale::Currency::Format::currency_format($code, $self->as_float, $format)
     );
 };
+
+# Liberally jacked from Math::Currency
+
+sub as_float {
+    my ($self) = @_;
+
+    return $self->value->copy->bfround( -2 )->bstr;
+}
+
+# Liberally jacked from Math::Currency
+
+sub as_int {
+    my ($self) = @_;
+
+    (my $str = $self->as_float) =~ s/\.//o;
+    $str =~ s/^(\-?)0+/$1/o;
+    return $str eq '' ? '0' : $str;
+}
 
 sub _to_utf8 {
     my $value = shift;
