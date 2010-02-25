@@ -1,9 +1,15 @@
 package Data::Currency::Types;
 
-use MooseX::Types -declare => [ qw(CurrencyCode Format) ];
+use MooseX::Types -declare => [ qw(Amount CurrencyCode Format) ];
 
-use MooseX::Types::Moose qw(Str);
+use MooseX::Types::Moose qw(Num Str);
 use Locale::Currency qw(code2currency);
+
+class_type Amount, { class => 'Math::BigFloat' };
+
+coerce Amount,
+    from Num,
+    via { Math::BigFloat->new($_, undef, -2) };
 
 subtype CurrencyCode,
     as Str,
