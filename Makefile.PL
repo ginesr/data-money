@@ -8,6 +8,7 @@ license 'perl';
 perl_version '5.006001';
 all_from 'lib/Data/Currency.pm';
 
+requires 'Check::ISA';
 requires 'Locale::Currency'         => '2.07';
 requires 'Locale::Currency::Format' => '1.22';
 requires 'Moose';
