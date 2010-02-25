@@ -24,6 +24,25 @@ use Data::Currency;
     cmp_ok($curr1, '==', 0.01, 'numification');
     cmp_ok($curr2, '==', 0.99, 'numification');
     cmp_ok($curr3, '==', 1.01, 'numification');
+
+    ok($curr1 < $curr2, '< with Data::Currency');
+    ok($curr1 < 1, '< with number');
+
+    ok($curr3 > $curr1, '> with Data::Currency');
+    ok($curr3 > 1, '> with number');
+
+    ok($curr3 >= Data::Currency->new(1.01), '>= with Data::Currency');
+    ok($curr3 >= Data::Currency->new(.01), '>= with Data::Currency (again)');
+    ok($curr3 >= 1.01, '>= with number');
+    ok($curr3 >= .01, '>= with number (again)');
+
+    ok($curr1 <= Data::Currency->new(1.01), '<= with Data::Currency');
+    ok($curr1 <= Data::Currency->new(.01), '<= with Data::Currency (again)');
+    ok($curr1 <= 1.01, '<= with number');
+    ok($curr1 <= .01, '<= with number (again)');
+
+    ok($curr1 == Data::Currency->new(0.01), '== with Data::Currency');
+    ok($curr1 == 0.01, '== with number');
 }
 
 
