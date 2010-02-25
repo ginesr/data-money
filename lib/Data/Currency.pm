@@ -17,7 +17,7 @@ use overload
     '*'     => sub { $_[0]->clone(value => $_[0]->value->copy->bmul($_[1])) },
     '/'     => sub { $_[0]->clone(value => scalar($_[0]->value->copy->bdiv($_[1]))) },
     '+='    => \&add_in_place,
-   '-='     => \&subtract_in_place,
+    '-='    => \&subtract_in_place,
     '""'    => sub { shift->stringify },
     fallback => 1;
 
@@ -212,6 +212,8 @@ Handled by the C<subtract> method.  Returns a new Data::Currency object.
 
 =item *
 
+Returns a new Data::Currency object.
+
 =item +=
 
 Handled by the C<add_in_place> method.  Modifies the left-hand object's value.
@@ -282,11 +284,32 @@ Adds the specified amount to this Data::Currency object and returns a new
 Data::Currency object.  You can supply either a number of a Data::Currency
 object.  Note that this B<does not> modify the existing object.
 
+=head2 add_in_place($amount)
+
+Adds the specified amount to this Data::Currency object, modifying it's value.
+You can supply either a number of a Data::Currency object.  Note that this
+B<does> modify the existing object.
+
+=head2 as_int
+
+Returns the object's value "in pennies" (in the US at least).  It
+strips the value of formatting using C<as_float> and of any decimals.
+
+=head2 as_float
+
+Returns objects value without any formatting.
+
 =head2 subtract($amount)
 
 Subtracts the specified amount to this Data::Currency object and returns a new
 Data::Currency object. You can supply either a number of a Data::Currency
 object. Note that this B<does not> modify the existing object.
+
+=head2 subtract_in_place($amount)
+
+Subtracts the specified amount to this Data::Currency object, modifying it's
+value. You can supply either a number of a Data::Currency object. Note that
+this B<does> modify the existing object.
 
 =head2 clone(%params)
 
