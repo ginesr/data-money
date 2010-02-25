@@ -28,11 +28,14 @@ cmp_ok($curr2 * 2, 'eq', '$1.98', '* with number (over a dollar)');
 
 # +=
 $curr1 += .99;
-cmp_ok($curr1, 'eq', '$1.00', '+= number');
+cmp_ok($curr1, 'eq', '$1.00', '+= with number');
 # cmp_ok($curr1 += $curr2, 'eq', '$1.00', '+= Data::Currency');
 
 # -=
-cmp_ok($curr2 -= 0.50, 'eq', '$0.49', '-= number');
-cmp_ok($curr3 -= $curr2, 'eq', '$0.01', '-= Data::Currency');
+$curr2 -= 0.50;
+cmp_ok($curr2, 'eq', '$0.49', '-= with number');
+
+$curr3 -= $curr2;
+cmp_ok($curr3, 'eq', '$0.52', '-= width Data::Currency');
 
 done_testing;

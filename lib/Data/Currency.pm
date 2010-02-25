@@ -16,7 +16,7 @@ use overload
     '-'     => \&subtract,
     '*'     => sub { $_[0]->clone(value => $_[0]->value->copy->bmul($_[1])) },
     '+='    => \&add_in_place,
-#    '-='    => \&substract,
+   '-='     => \&subtract_in_place,
     '""'    => sub { shift->stringify },
     fallback => 1;
 
@@ -87,9 +87,9 @@ sub add_in_place {
 
     if(obj($num, 'Data::Currency')) {
         $self->value($self->value->copy->badd($num->value));
-        return $self;
+    } else {
+        $self->value($self->value->copy->badd(Math::BigFloat->new($num)));
     }
-    $self->value($self->value->copy->badd(Math::BigFloat->new($num)));
     return $self;
 }
 
@@ -131,8 +131,21 @@ sub subtract {
     if(obj($num, 'Data::Currency')) {
         return $self->clone(value => $self->value->copy->bsub($num->value));
     }
-    return $_[0]->clone(value => $_[0]->value->copy->bsub(Math::BigFloat->new($_[1])))
+    return $self->clone(value => $self->value->copy->bsub(Math::BigFloat->new($num)))
 }
+
+sub subtract_in_place {
+    my ($self, $num) = @_;
+
+    if(obj($num, 'Data::Currency')) {
+        $self->value($self->value->copy->bsub($num->value));
+    } else {
+        $self->value($self->value->copy->bsub(Math::BigFloat->new($num)));
+    }
+
+    return $self;
+}
+
 
 sub _to_utf8 {
     my $value = shift;
