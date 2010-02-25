@@ -9,7 +9,12 @@ class_type Amount, { class => 'Math::BigFloat' };
 
 coerce Amount,
     from Num,
-    via { Math::BigFloat->new($_, undef, -2) };
+    via { Math::BigFloat->new($_) };
+
+coerce Amount,
+    from Str,
+    via { Math::BigFloat->new($_) };
+
 
 subtype CurrencyCode,
     as Str,
