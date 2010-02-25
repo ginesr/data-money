@@ -8,14 +8,15 @@ $VERSION = '0.04002';
 
 with qw(MooseX::Clone);
 
+use Check::ISA qw(obj);
 use Math::BigFloat;
 
 use overload
-    '+'     => sub { $_[0]->clone( value => $_[0]->value->copy->badd($_[1]) ) },
-    '-'     => sub { my $c = $_[0]->value->copy; $_[2] ? $c->bneg()->badd( $_[1]) : $c->bsub( $_[1]); return $_[0]->clone(value => $c)},
-    '*'     => sub { $_[0]->clone( value => $_[0]->value->copy->bmul($_[1]) ) },
-    '+='    => sub { $_[0]->clone( value => $_[0]->value->copy->badd($_[1]) ) },
-    '-='    => sub { $_[0]->clone( value => $_[0]->value->copy->bsub($_[1]) ) },
+    '+'     => \&add,
+    '-'     => \&subtract,
+    '*'     => sub { $_[0]->clone(value => $_[0]->value->copy->bmul($_[1])) },
+    '+='    => \&add_in_place,
+#    '-='    => \&substract,
     '""'    => sub { shift->stringify },
     fallback => 1;
 
@@ -54,6 +55,44 @@ sub BUILDARGS {
     return $args[0];
 }
 
+# Liberally jacked from Math::Currency
+
+sub as_float {
+    my ($self) = @_;
+
+    return $self->value->copy->bfround( -2 )->bstr;
+}
+
+# Liberally jacked from Math::Currency
+
+sub as_int {
+    my ($self) = @_;
+
+    (my $str = $self->as_float) =~ s/\.//o;
+    $str =~ s/^(\-?)0+/$1/o;
+    return $str eq '' ? '0' : $str;
+}
+
+sub add {
+    my ($self, $num) = @_;
+
+    if(obj($num, 'Data::Currency')) {
+        return $self->clone(value => $self->value->copy->badd($num->value));
+    }
+    return $self->clone(value => $self->value->copy->badd(Math::BigFloat->new($num)))
+}
+
+sub add_in_place {
+    my ($self, $num) = @_;
+
+    if(obj($num, 'Data::Currency')) {
+        $self->value($self->value->copy->badd($num->value));
+        return $self;
+    }
+    $self->value($self->value->copy->badd(Math::BigFloat->new($num)));
+    return $self;
+}
+
 sub name {
     my ($self) = @_;
     my $name = Locale::Currency::code2currency($self->code);
@@ -86,22 +125,13 @@ sub stringify {
     );
 };
 
-# Liberally jacked from Math::Currency
+sub subtract {
+    my ($self, $num) = @_;
 
-sub as_float {
-    my ($self) = @_;
-
-    return $self->value->copy->bfround( -2 )->bstr;
-}
-
-# Liberally jacked from Math::Currency
-
-sub as_int {
-    my ($self) = @_;
-
-    (my $str = $self->as_float) =~ s/\.//o;
-    $str =~ s/^(\-?)0+/$1/o;
-    return $str eq '' ? '0' : $str;
+    if(obj($num, 'Data::Currency')) {
+        return $self->clone(value => $self->value->copy->bsub($num->value));
+    }
+    return $_[0]->clone(value => $_[0]->value->copy->bsub(Math::BigFloat->new($_[1])))
 }
 
 sub _to_utf8 {
@@ -154,6 +184,8 @@ Data::Currency overloads the following operators:
 =over 4
 
 =item +
+
+Handled the C<add> method.
 
 =item -
 
@@ -212,6 +244,18 @@ currency code is set the method will die.
 Returns the original price value given to C<new>.
 
 =head1 METHODS
+
+=head2 add($amount)
+
+Adds the specified amount to this Data::Currency object and returns a new
+Data::Currency object.  You can supply either a number of a Data::Currency
+object.  Note that this B<does not> modify the existing object.
+
+=head2 subtract($amount)
+
+Subtracts the specified amount to this Data::Currency object and returns a new
+Data::Currency object. You can supply either a number of a Data::Currency
+object. Note that this B<does not> modify the existing object.
 
 =head2 clone(%params)
 
