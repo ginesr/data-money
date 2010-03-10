@@ -180,43 +180,43 @@ Data::Money - Money/currency with formatting and overloading.
 The Data::Money module provides basic currency formatting and number handling
 via L<Math::BigFloat>:
 
-    my $currency = Data::Currency->new(value => 1.23);
+    my $currency = Data::Money->new(value => 1.23);
 
-Each Data::Currency object will stringify to the original value except in string
+Each Data::Money object will stringify to the original value except in string
 context, where it stringifies to the format specified in C<format>.
 
 =head1 OPERATOR OVERLOADING
 
-Data::Currency overrides some operators.  It is important to note which
+Data::Money overrides some operators.  It is important to note which
 operators change the object's value and which return new ones.  Addition and
-subtraction operators accept either a Data::Currency argument or a normal
+subtraction operators accept either a Data::Money argument or a normal
 number via scalar.  Others expect only a number.
 
-Data::Currency overloads the following operators:
+Data::Money overloads the following operators:
 
 =over 4
 
 =item +
 
-Handled by the C<add> method.  Returns a new Data::Currency object.
+Handled by the C<add> method.  Returns a new Data::Money object.
 
 =item -
 
-Handled by the C<subtract> method.  Returns a new Data::Currency object.
+Handled by the C<subtract> method.  Returns a new Data::Money object.
 
 =item *
 
-Returns a new Data::Currency object.
+Returns a new Data::Money object.
 
 =item +=
 
 Handled by the C<add_in_place> method.  Modifies the left-hand object's value.
-Works with either a Data::Currency argument or a normal number.
+Works with either a Data::Money argument or a normal number.
 
 =item -=
 
 Handled by the C<subtract_in_place> method.  Modifies the left-hand object's value.
-Works with either a Data::Currency argument or a normal number.
+Works with either a Data::Money argument or a normal number.
 
 =back
 
@@ -246,14 +246,14 @@ The amount of money/currency.  Defaults to 0.
 
 =head2 add($amount)
 
-Adds the specified amount to this Data::Currency object and returns a new
-Data::Currency object.  You can supply either a number of a Data::Currency
+Adds the specified amount to this Data::Money object and returns a new
+Data::Money object.  You can supply either a number of a Data::Money
 object.  Note that this B<does not> modify the existing object.
 
 =head2 add_in_place($amount)
 
-Adds the specified amount to this Data::Currency object, modifying it's value.
-You can supply either a number of a Data::Currency object.  Note that this
+Adds the specified amount to this Data::Money object, modifying it's value.
+You can supply either a number of a Data::Money object.  Note that this
 B<does> modify the existing object.
 
 =head2 as_int
@@ -267,19 +267,19 @@ Returns objects value without any formatting.
 
 =head2 subtract($amount)
 
-Subtracts the specified amount to this Data::Currency object and returns a new
-Data::Currency object. You can supply either a number of a Data::Currency
+Subtracts the specified amount to this Data::Money object and returns a new
+Data::Money object. You can supply either a number of a Data::Money
 object. Note that this B<does not> modify the existing object.
 
 =head2 subtract_in_place($amount)
 
-Subtracts the specified amount to this Data::Currency object, modifying it's
-value. You can supply either a number of a Data::Currency object. Note that
+Subtracts the specified amount to this Data::Money object, modifying it's
+value. You can supply either a number of a Data::Money object. Note that
 this B<does> modify the existing object.
 
 =head2 clone(%params)
 
-Clone this Data::Currency object and creates a new one.  You may optionally
+Returns a clone (new instance) of this Data::Money object.  You may optionally
 specify some of the attributes to overwrite.
 
   $curr->clone({ value => 100 }); # Clones all fields but changes value to 100
