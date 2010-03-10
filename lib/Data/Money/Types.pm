@@ -1,4 +1,4 @@
-package Data::Currency::Types;
+package Data::Money::Types;
 
 use MooseX::Types -declare => [ qw(Amount CurrencyCode Format) ];
 

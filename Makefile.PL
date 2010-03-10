@@ -6,7 +6,10 @@ use inc::Module::Install 0.65;
 name 'Data-Currency';
 license 'perl';
 perl_version '5.006001';
-all_from 'lib/Data/Currency.pm';
+all_from 'lib/Data/Money.pm';
+
+test_requires 'Test::utf8';
+test_requires 'Test::Exception';
 
 requires 'Check::ISA';
 requires 'Locale::Currency'         => '2.07';
@@ -16,12 +19,8 @@ requires 'MooseX::Clone';
 requires 'MooseX::Types';
 requires 'Math::BigFloat';
 
-tests "t/*.t t/*/*.t";
-clean_files "Data-Currency-* t/var";
-
 eval {
-    system 'pod2text lib/Data/Currency.pm > README';
+    system 'pod2text lib/Data/Money.pm > README';
 };
 
-auto_install;
 WriteAll;

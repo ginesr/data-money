@@ -1,10 +1,10 @@
-package Data::Currency;
+package Data::Money;
 use strict;
 use warnings;
 use Moose;
 
 use vars qw/$VERSION/;
-$VERSION = '0.04002';
+$VERSION = '0.01';
 
 with qw(MooseX::Clone);
 
@@ -22,11 +22,10 @@ use overload
     '""'    => sub { shift->stringify },
     fallback => 1;
 
-use Data::Currency::Types qw(Amount CurrencyCode Format);
+use Data::Money::Types qw(Amount CurrencyCode Format);
 use MooseX::Types::Moose qw(HashRef);
 use Locale::Currency;
 use Locale::Currency::Format;
-use Carp;
 
 has code => (
     is => 'rw',
@@ -45,24 +44,12 @@ has value => (
     coerce => 1
 );
 
-sub BUILDARGS {
-    my ($class, @args) = @_;
-
-    if(@args == 1 && (!is_HashRef($args[0]))) {
-        return { value => $args[0] };
-    } elsif(scalar(@args) % 2 == 0) {
-        return { @args };
-    }
-
-    return $args[0];
-}
-
 # Liberally jacked from Math::Currency
 
 sub as_float {
     my ($self) = @_;
 
-    return $self->value->copy->bfround( -2 )->bstr;
+    return $self->value->copy->bfround(-2)->bstr;
 }
 
 # Liberally jacked from Math::Currency
@@ -78,7 +65,7 @@ sub as_int {
 sub add {
     my ($self, $num) = @_;
 
-    if(obj($num, 'Data::Currency')) {
+    if(obj($num, 'Data::Money')) {
         return $self->clone(value => $self->value->copy->badd($num->value));
     }
     return $self->clone(value => $self->value->copy->badd(Math::BigFloat->new($num)))
@@ -87,7 +74,7 @@ sub add {
 sub add_in_place {
     my ($self, $num) = @_;
 
-    if(obj($num, 'Data::Currency')) {
+    if(obj($num, 'Data::Money')) {
         $self->value($self->value->copy->badd($num->value));
     } else {
         $self->value($self->value->copy->badd(Math::BigFloat->new($num)));
@@ -112,14 +99,10 @@ sub stringify {
     my $format = shift || $self->format;
     my $code = $self->code;
 
-    if (!$format) {
-        $format = 'FMT_COMMON';
-    };
-
     ## funky eval to get string versions of constants back into the values
     eval '$format = Locale::Currency::Format::' .  $format;
 
-    croak 'Invalid currency code:  ' . ($code || 'undef')
+    die 'Invalid currency code:  ' . ($code || 'undef')
         unless is_CurrencyCode($code);
 
     return _to_utf8(
@@ -130,7 +113,7 @@ sub stringify {
 sub subtract {
     my ($self, $num) = @_;
 
-    if(obj($num, 'Data::Currency')) {
+    if(obj($num, 'Data::Money')) {
         return $self->clone(value => $self->value->copy->bsub($num->value));
     }
     return $self->clone(value => $self->value->copy->bsub(Math::BigFloat->new($num)))
@@ -139,7 +122,7 @@ sub subtract {
 sub subtract_in_place {
     my ($self, $num) = @_;
 
-    if(obj($num, 'Data::Currency')) {
+    if(obj($num, 'Data::Money')) {
         $self->value($self->value->copy->bsub($num->value));
     } else {
         $self->value($self->value->copy->bsub(Math::BigFloat->new($num)));
@@ -165,29 +148,39 @@ __END__
 
 =head1 NAME
 
-Data::Currency - Container class for currency conversion/formatting
+Data::Money - Money/currency with formatting and overloading.
 
 =head1 SYNOPSIS
 
-    use Data::Currency;
+    use Data::Money;
 
-    my $price = Data::Currency->new(value => 1.2. code => 'USD');
+    my $price = Data::Money->new(value => 1.2. code => 'USD');
     # or
-    my $price = Data::Currency->new(1.2); # defaults to USD
-    print $price;            # 1.20 USD
+    print $price;            # $1.20
     print $price->code;      # USD
-    print $price->format;    # FMT_SYMBOL
-    print $price->as_string; # 1.20 USD
+    print $price->format;    # FMT_COMMON
+    print $price->as_string; # $1.20
+
+    # Overloading, returns new instance
+    my $m2 = $price + 1;
+    my $m3 = $price - 1;
+
+    # Objects work too
+    my $m4 = $m2 + $m3;
+    my $m5 = $m2 - $m3;
+
+    # Modifies in place
+    $price += 1;
+    $price -= 1;
+
     print $price->as_string('FMT_SYMBOL'); # $1.20
 
 =head1 DESCRIPTION
 
-The Data::Currency module provides basic currency formatting:
+The Data::Money module provides basic currency formatting and number handling
+via L<Math::BigFloat>:
 
-    my $price = 1.23;
-    my $currency = Data::Currency->new($price);
-
-    print $currency->convert('CAD')->as_string;
+    my $currency = Data::Currency->new(value => 1.23);
 
 Each Data::Currency object will stringify to the original value except in string
 context, where it stringifies to the format specified in C<format>.
@@ -225,48 +218,20 @@ Works with either a Data::Currency argument or a normal number.
 Handled by the C<subtract_in_place> method.  Modifies the left-hand object's value.
 Works with either a Data::Currency argument or a normal number.
 
-=head1 CONSTRUCTOR
-
-=head2 new
-
-=over
-
-=item Arguments: $price [, $code, $format] || \%options
-
 =back
-
-To create a new Data::Currency object, simply call C<new> and pass in the
-price to be formatted:
-
-    my $currency = Data::Currency->new(10.23);
-
-    my $currency = Data::Currency->new({
-        value  => 1.23,
-        code   => 'CAD',
-        format => 'FMT_SYMBOL',
-    });
-
-You can also pass in the default currency code and/or currency format to be
-used for each instance. If no code or format are supplied, future calls to
-C<as_string> and C<convert> will use the default format and code values.
-
-The following defaults are set when Data::Currency is loaded:
-
-    value:  0
-    code:   USD
-    format: FMT_COMMON
 
 =head1 ATTRIBUTES
 
 =head2 code
 
 Gets/sets the three letter currency code for the current currency object.
+Defaults to USD
 
 =head2 format
 
 Gets/sets the format to be used when C<as_string> is called. See
 L<Locale::Currency::Format|Locale::Currency::Format> for the available
-formatting options.
+formatting options.  Defaults to C<FMT_COMMON>.
 
 =head2 name
 
@@ -275,7 +240,7 @@ currency code is set the method will die.
 
 =head2 value
 
-Returns the original price value given to C<new>.
+The amount of money/currency.  Defaults to 0.
 
 =head1 METHODS
 
@@ -319,6 +284,8 @@ specify some of the attributes to overwrite.
 
   $curr->clone({ value => 100 }); # Clones all fields but changes value to 100
 
+See L<MooseX::Clone> for more information.
+
 =head2 stringify
 
 Sames as C<as_string>.
@@ -330,11 +297,26 @@ Returns the current objects value as a formatted currency string.
 =head1 SEE ALSO
 
 L<Locale::Currency>, L<Locale::Currency::Format>,
-L<Finance::Currency::Convert::WebserviceX>
+
+=head1 ACKNOWLEDGEMENTS
+
+This module was originally based on L<Data::Currency> by Christopher H. Laco
+but I opted to fork and create a whole new module because my work was wildly
+different from the original. I decided it was better to make a new module than
+to break back compat and surprise users. Many thanks to him for the great
+module.
+
+Inspiration and ideas were also drawn from L<Math::Currency> and
+L<Math::BigFloat>.
 
 =head1 AUTHOR
 
-    Christopher H. Laco
-    CPAN ID: CLACO
-    claco@chrislaco.com
-    http://today.icantfocus.com/blog/
+Cory G Watson, C<< <gphat at cpan.org> >>
+
+Copyright 2010 Cory Watson
+ 
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+ 
+See http://dev.perl.org/licenses/ for more information.

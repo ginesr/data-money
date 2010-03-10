@@ -45,7 +45,6 @@ use Data::Currency;
     ok($curr1 == 0.01, '== with number');
 }
 
-
 # Addition
 {
     my $curr1 = Data::Currency->new(value => 0.01);
