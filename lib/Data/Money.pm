@@ -155,7 +155,6 @@ Data::Money - Money/currency with formatting and overloading.
     use Data::Money;
 
     my $price = Data::Money->new(value => 1.2. code => 'USD');
-    # or
     print $price;            # $1.20
     print $price->code;      # USD
     print $price->format;    # FMT_COMMON
@@ -184,6 +183,13 @@ via L<Math::BigFloat>:
 
 Each Data::Money object will stringify to the original value except in string
 context, where it stringifies to the format specified in C<format>.
+
+=head1 MOTIVATION
+
+Data::Money was created to make it easy to use different currencies (leveraging
+existing work in C<Locale::Currency> and L<Moose>), to allow math operations
+with proper rounding (via L<Math::BigFloat>) and formatting via
+L<Locale::Currency::Format>.
 
 =head1 OPERATOR OVERLOADING
 
