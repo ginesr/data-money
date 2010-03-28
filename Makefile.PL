@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use inc::Module::Install 0.65;
 
-name 'Data-Currency';
+name 'Data-Money';
 license 'perl';
 perl_version '5.006001';
 all_from 'lib/Data/Money.pm';
