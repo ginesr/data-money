@@ -20,6 +20,7 @@ use overload
     '-='    => \&subtract_in_place,
     '0+'    => sub { $_[0]->value->numify; },
     '""'    => sub { shift->stringify },
+    'bool'  => sub { shift->as_int; },
     fallback => 1;
 
 use Data::Money::Types qw(Amount CurrencyCode Format);

@@ -114,4 +114,22 @@ use Data::Money;
     cmp_ok($currx, 'eq', '$0.52', '-= width Data::Money');
 }
 
+# boolean
+{
+    my $curr1 = new Data::Money;
+    my $curr2 = Data::Money->new(value => 1);
+    my $curr3 = Data::Money->new(value => 0);
+    my $curr4 = Data::Money->new(value => -1);
+    my $curr5 = Data::Money->new(value => 1.00);
+    my $curr6 = Data::Money->new(value => 0.00);
+    my $curr7 = Data::Money->new(value => -1.00);
+    ok(!$curr1, 'boolean false on new object');
+    ok($curr2, 'boolean true on int > 0');
+    ok(!$curr3, 'boolean false on int == 0');
+    ok($curr4, 'boolean true on int < 0');
+    ok($curr5, 'boolean true on float > 0');
+    ok(!$curr6, 'boolean false on float == 0');
+    ok($curr7, 'boolean true on float < 0');
+}
+
 done_testing;
