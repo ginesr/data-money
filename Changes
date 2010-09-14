@@ -1,5 +1,8 @@
 Revision history for Data::Money
 
+0.03
+    - Add an overloaded three-way comparator and allow coercion from itself
+
 0.02
     - Strip out formatting (holophrastic)
 
