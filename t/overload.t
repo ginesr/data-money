@@ -76,7 +76,7 @@ use Data::Money;
     cmp_ok($curr2 * 2, 'eq', '$1.98', '* with number (over a dollar)');
 }
 
-# Multiplication
+# Division
 {
     my $curr1 = Data::Money->new(value => 1.00);
     my $curr2 = Data::Money->new(value => 0.99);
@@ -130,6 +130,40 @@ use Data::Money;
     ok($curr5, 'boolean true on float > 0');
     ok(!$curr6, 'boolean false on float == 0');
     ok($curr7, 'boolean true on float < 0');
+}
+
+# precision
+{
+    my $curr1 = Data::Money->new(value => 0.011);
+    my $curr2 = Data::Money->new(value => 0.999);
+    my $curr3 = Data::Money->new(value => 1.011);
+
+    cmp_ok($curr1, '==', 0.01, 'numification with precision');
+    cmp_ok($curr2, '==', 1.00, 'numification with precision');
+    cmp_ok($curr3, '==', 1.01, 'numification with precision');
+
+
+    ok($curr1 == Data::Money->new(value => 0.011), '== with Data::Money');
+    ok($curr1 == 0.01, '== with number and precision');
+}
+
+# disparate currency tests
+{
+    my $curr1 = Data::Money->new(value => 0.99, code => 'USD');
+    my $curr2 = Data::Money->new(value => 0.99, code => 'CAD');
+
+    eval { my $lt_test = 'unable to compare different currency types' if($curr1 < $curr2); };
+    ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on <');
+
+    eval { my $lteq_test = 'unable to compare different currency types' if($curr1 <= $curr2); };
+    ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on <=');
+
+    eval { my $gt_test = 'unable to compare different currency types' if($curr1 > $curr2); };
+    ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on >');
+
+    eval { my $gteq_test = 'unable to compare different currency types' if($curr1 >= $curr2); };
+    ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on >=');
+
 }
 
 done_testing;

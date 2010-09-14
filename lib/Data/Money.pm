@@ -21,6 +21,8 @@ use overload
     '0+'    => sub { $_[0]->value->numify; },
     '""'    => sub { shift->stringify },
     'bool'  => sub { shift->as_int; },
+    '<=>'   => \&three_way_compare,
+    'cmp'   => \&three_way_compare,
     fallback => 1;
 
 use Data::Money::Types qw(Amount CurrencyCode Format);
@@ -143,6 +145,27 @@ sub _to_utf8 {
 
     return $value;
 };
+
+sub three_way_compare {
+    my $self = shift;
+    my $num = shift || 0;
+    my $y;
+
+    if(obj($num, 'Data::Money')) {
+        $y = $num;
+    } else {
+        # we clone here to ensure that if we're comparing a number to
+        # an object, that the currency codes match (and we don't just
+        # get the default).
+        $y = $self->clone(value => $num);
+    }
+    if($self->code ne $y->code) {
+        die('unable to compare different currency types');
+    }
+    return $self->as_float <=> $y->as_float;
+}
+
+
 
 1;
 __END__
