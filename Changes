@@ -2,6 +2,9 @@ Revision history for Data::Money
 
 0.03
     - Add an overloaded three-way comparator and allow coercion from itself
+    - Add absolute value
+    - Take stringification out of as_float and put it back in stringify where it belongs
+    - More unit tests
 
 0.02
     - Strip out formatting (holophrastic)

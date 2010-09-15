@@ -4,7 +4,7 @@ use warnings;
 use Moose;
 
 use vars qw/$VERSION/;
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 with qw(MooseX::Clone);
 
@@ -23,6 +23,7 @@ use overload
     'bool'  => sub { shift->as_int; },
     '<=>'   => \&three_way_compare,
     'cmp'   => \&three_way_compare,
+    'abs'   => sub { shift->absolute },
     fallback => 1;
 
 use Data::Money::Types qw(Amount CurrencyCode Format);
@@ -52,7 +53,7 @@ has value => (
 sub as_float {
     my ($self) = @_;
 
-    return $self->value->copy->bfround(-2)->bstr;
+    return $self->value->copy->bfround(-2);
 }
 
 # Liberally jacked from Math::Currency
@@ -63,6 +64,11 @@ sub as_int {
     (my $str = $self->as_float) =~ s/\.//o;
     $str =~ s/^(\-?)0+/$1/o;
     return $str eq '' ? '0' : $str;
+}
+
+sub absolute {
+    my ($self) = @_;
+    return $self->clone(value => abs($self->value));
 }
 
 sub add {
@@ -109,7 +115,7 @@ sub stringify {
         unless is_CurrencyCode($code);
 
     return _to_utf8(
-        Locale::Currency::Format::currency_format($code, $self->as_float, $format)
+        Locale::Currency::Format::currency_format($code, $self->as_float->bstr, $format)
     );
 };
 
@@ -164,7 +170,6 @@ sub three_way_compare {
     }
     return $self->as_float <=> $y->as_float;
 }
-
 
 
 1;

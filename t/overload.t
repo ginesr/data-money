@@ -166,4 +166,24 @@ use Data::Money;
 
 }
 
+# negative values
+{
+    my $curr1 = Data::Money->new(value => -1.00);
+    my $curr2 = Data::Money->new(value => -2.00);
+
+    ok($curr1 < 0, 'Negative values with number');
+    ok($curr2 < $curr1, 'Negative values with Data::Money');
+}
+
+
+# absolute value
+{
+    my $curr1 = Data::Money->new(value => -1.00);
+    my $curr2 = Data::Money->new(value => 1.00);
+
+    ok(abs($curr1) == 1.00, 'Absolute value with number');
+    ok(abs($curr1) == $curr2, 'Absolute value with Data::Money');
+}
+
+
 done_testing;
