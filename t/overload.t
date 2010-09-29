@@ -1,4 +1,4 @@
-use Test::More;
+use Test::More tests => 79;
 use strict;
 
 use Data::Money;
@@ -66,24 +66,40 @@ use Data::Money;
     cmp_ok($curr3 - 0.02, 'eq', '$0.99', '- with number');
 }
 
-# Multiplication
+# Multiplication (* and *=)
 {
     my $curr1 = Data::Money->new(value => 0.01);
     my $curr2 = Data::Money->new(value => 0.99);
-    my $curr3 = Data::Money->new(value => 1.01);
+    my $curr3 = Data::Money->new(value => 0.02);
+    my $curr4 = Data::Money->new(value => 1.01);
+    my $curr5 = Data::Money->new(value => 2.00);
 
     cmp_ok($curr1 * 2, 'eq', '$0.02', '* with number');
     cmp_ok($curr2 * 2, 'eq', '$1.98', '* with number (over a dollar)');
+    cmp_ok($curr1 * $curr5, 'eq', '$0.02', '* with Data::Money');
+    cmp_ok($curr2 * $curr5, 'eq', '$1.98', '* with Data::Money (over a dollar)');
+    cmp_ok($curr1 * 2, 'eq', '$0.02', '*= with number');
+    cmp_ok($curr2 * 2, 'eq', '$1.98', '*= with number (over a dollar)');
+    cmp_ok($curr3 *= $curr5, 'eq', '$0.04', '*= with Data::Money');
+    cmp_ok($curr4 *= $curr5, 'eq', '$2.02', '*= with Data::Money (over a dollar)');
 }
 
-# Division
+# Division (/ and /=)
 {
     my $curr1 = Data::Money->new(value => 1.00);
     my $curr2 = Data::Money->new(value => 0.99);
-    my $curr3 = Data::Money->new(value => 1.01);
+    my $curr3 = Data::Money->new(value => 0.04);
+    my $curr4 = Data::Money->new(value => 3.99);
+    my $curr5 = Data::Money->new(value => 2.00);
 
     cmp_ok($curr1 / 2, 'eq', '$0.50', '/ with number');
     cmp_ok($curr2 / 2, 'eq', '$0.50', '/ with number rounding');
+    cmp_ok($curr3 / $curr5, 'eq', '$0.02', '/ with Data::Money');
+    cmp_ok($curr4 / $curr5, 'eq', '$2.00', '/ with Data::Money rounding');
+    cmp_ok($curr1 /= 2, 'eq', '$0.50', '/= with number');
+    cmp_ok($curr2 /= 2, 'eq', '$0.50', '/= with number rounding');
+    cmp_ok($curr3 /= $curr5, 'eq', '$0.02', '/= with Data::Money');
+    cmp_ok($curr4 /= $curr5, 'eq', '$2.00', '/= with Data::Money rounding');
 }
 
 # +=
@@ -152,6 +168,33 @@ use Data::Money;
     my $curr1 = Data::Money->new(value => 0.99, code => 'USD');
     my $curr2 = Data::Money->new(value => 0.99, code => 'CAD');
 
+    eval { my $add_test = $curr1 + $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +');
+
+    eval { $curr1 += $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +=');
+
+    eval { my $sub_test = $curr1 - $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on -');
+
+    eval { $curr1 -= $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on -=');
+
+    eval { my $multiply_test = $curr1 * $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on *');
+
+    eval { $curr1 *= $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on *=');
+
+    eval { my $division_test = $curr1 / $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on /');
+
+    eval { $curr1 /= $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on /=');
+
+    eval { my $modulo_test = $curr1 % $curr2; };
+    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +');
+
     eval { my $lt_test = 'unable to compare different currency types' if($curr1 < $curr2); };
     ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on <');
 
@@ -166,13 +209,19 @@ use Data::Money;
 
 }
 
-# negative values
+# negative values and unary minus
 {
     my $curr1 = Data::Money->new(value => -1.00);
     my $curr2 = Data::Money->new(value => -2.00);
+    my $curr3 = Data::Money->new(value => 1.00);
+    my $curr4 = Data::Money->new(value => 2.00);
 
     ok($curr1 < 0, 'Negative values with number');
     ok($curr2 < $curr1, 'Negative values with Data::Money');
+    ok(-$curr3 eq '-$1.00', 'Unary minus works with number');
+    ok(-$curr1 eq '$1.00', 'Unary minus works in reverse with number');
+    ok(-$curr4 == $curr2, 'Unary minus works with Data::Money');
+    ok(-$curr2 == $curr4, 'Unary minus works in reverse with Data::Money');
 }
 
 
