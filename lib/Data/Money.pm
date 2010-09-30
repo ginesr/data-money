@@ -528,6 +528,10 @@ module.
 Inspiration and ideas were also drawn from L<Math::Currency> and
 L<Math::BigFloat>.
 
+Major contributions (more overloaded operators, disallowing operations on
+mismatched currences, absolute value, negation and unit tests) from
+Andrew Nelson.
+
 =head1 AUTHOR
 
 Cory G Watson, C<< <gphat at cpan.org> >>
