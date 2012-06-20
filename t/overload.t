@@ -169,43 +169,43 @@ use Data::Money;
     my $curr2 = Data::Money->new(value => 0.99, code => 'CAD');
 
     eval { my $add_test = $curr1 + $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +');
 
     eval { $curr1 += $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +=');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +=');
 
     eval { my $sub_test = $curr1 - $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on -');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on -');
 
     eval { $curr1 -= $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on -=');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on -=');
 
     eval { my $multiply_test = $curr1 * $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on *');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on *');
 
     eval { $curr1 *= $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on *=');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on *=');
 
     eval { my $division_test = $curr1 / $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on /');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on /');
 
     eval { $curr1 /= $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on /=');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on /=');
 
     eval { my $modulo_test = $curr1 % $curr2; };
-    ok($@ =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +');
+    ok($@->error =~ /^unable to perform arithmetic on different currency types/, 'Disparate codes die on +');
 
     eval { my $lt_test = 'unable to compare different currency types' if($curr1 < $curr2); };
-    ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on <');
+    ok($@->error =~ /^unable to compare different currency types/, 'Disparate codes die on <');
 
     eval { my $lteq_test = 'unable to compare different currency types' if($curr1 <= $curr2); };
-    ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on <=');
+    ok($@->error =~ /^unable to compare different currency types/, 'Disparate codes die on <=');
 
     eval { my $gt_test = 'unable to compare different currency types' if($curr1 > $curr2); };
-    ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on >');
+    ok($@->error =~ /^unable to compare different currency types/, 'Disparate codes die on >');
 
     eval { my $gteq_test = 'unable to compare different currency types' if($curr1 >= $curr2); };
-    ok($@ =~ /^unable to compare different currency types/, 'Disparate codes die on >=');
+    ok($@->error =~ /^unable to compare different currency types/, 'Disparate codes die on >=');
 
 }
 

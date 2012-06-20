@@ -10,7 +10,6 @@ with qw(MooseX::Clone);
 
 use Check::ISA qw(obj);
 use Math::BigFloat;
-use Carp qw(croak);
 
 use overload
     '+'     => \&add,
@@ -33,6 +32,7 @@ use overload
     fallback => 1;
 
 
+use Data::Money::Exception;
 use Data::Money::Types qw(Amount CurrencyCode Format);
 use MooseX::Types::Moose qw(HashRef);
 use Locale::Currency;
@@ -93,7 +93,7 @@ sub add {
 
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         return $self->clone(value => $self->value->copy->badd($num->value));
     }
@@ -105,7 +105,7 @@ sub add_in_place {
 
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         $self->value($self->value->copy->badd($num->value));
     } else {
@@ -135,7 +135,7 @@ sub stringify {
     eval '$format = Locale::Currency::Format::' .  $format;
 
     if(! is_CurrencyCode($code)) {
-        croak 'Invalid currency code:  ' . ($code || 'undef')
+        Data::Money::Exception->throw(error => 'Invalid currency code:  ' . ($code || 'undef'));
     }
 
     my $utf8 = _to_utf8(
@@ -155,7 +155,7 @@ sub subtract {
 
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         return $self->clone(value => $self->value->copy->bsub($num->value));
     }
@@ -167,7 +167,7 @@ sub subtract_in_place {
 
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         $self->value($self->value->copy->bsub($num->value));
     } else {
@@ -181,7 +181,7 @@ sub multiply {
 
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         return $self->clone(value => $self->value->copy->bmul($num->value));
     }
@@ -193,7 +193,7 @@ sub multiply_in_place {
 
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         $self->value($self->value->copy->bmul($num->value));
     } else {
@@ -207,7 +207,7 @@ sub divide {
     my $val;
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         $val = $self->value->copy->bdiv($num->value);
         return $self->clone(value => $val);
@@ -221,7 +221,7 @@ sub divide_in_place {
 
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         $self->value($self->value->copy->bdiv($num->value));
     } else {
@@ -235,7 +235,7 @@ sub modulo {
     my $val;
     if(obj($num, 'Data::Money')) {
         if($self->code ne $num->code) {
-            croak 'unable to perform arithmetic on different currency types';
+            Data::Money::Exception->throw(error => 'unable to perform arithmetic on different currency types');
         }
         $val = $self->value->copy->bmod($num->value);
         return $self->clone(value => $val);
@@ -269,7 +269,7 @@ sub three_way_compare {
         $y = $self->clone(value => $num);
     }
     if($self->code ne $y->code) {
-        croak 'unable to compare different currency types';
+        Data::Money::Exception->throw(error => 'unable to compare different currency types');
     }
     return $self->value->copy->bfround(-2) <=> $y->value->copy->bfround(-2);
 }
