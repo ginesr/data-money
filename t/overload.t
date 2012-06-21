@@ -1,4 +1,4 @@
-use Test::More tests => 79;
+use Test::More tests => 74;
 use strict;
 
 use Data::Money;
@@ -146,21 +146,6 @@ use Data::Money;
     ok($curr5, 'boolean true on float > 0');
     ok(!$curr6, 'boolean false on float == 0');
     ok($curr7, 'boolean true on float < 0');
-}
-
-# precision
-{
-    my $curr1 = Data::Money->new(value => 0.011);
-    my $curr2 = Data::Money->new(value => 0.999);
-    my $curr3 = Data::Money->new(value => 1.011);
-
-    cmp_ok($curr1, '==', 0.01, 'numification with precision');
-    cmp_ok($curr2, '==', 1.00, 'numification with precision');
-    cmp_ok($curr3, '==', 1.01, 'numification with precision');
-
-
-    ok($curr1 == Data::Money->new(value => 0.011), '== with Data::Money');
-    ok($curr1 == 0.01, '== with number and precision');
 }
 
 # disparate currency tests

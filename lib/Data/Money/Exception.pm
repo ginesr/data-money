@@ -6,6 +6,8 @@ use warnings;
 use Moose;
 with 'Throwable';
 
+use overload '""' => sub { shift->error };
+
 has error => (
     is => 'ro',
     isa => 'Str',

@@ -55,12 +55,43 @@ has value => (
     coerce => 1,
 );
 
+sub BUILD {
+    my ($self) = @_;
+    my $exp = 0;
+    my $dec = $self->value->copy->bmod(1);
+    if($dec) {
+        $exp = $dec->exponent->babs;
+    }
+    my $prec = Math::BigInt->new($self->_decimal_precision);
+    if($exp > $prec) {
+        Data::Money::Exception->throw(error => 'Excessive precision for this currency type');
+    }
+}
+
+# Method, not an attribute, since format/currency code can be changed on the fly.
+sub _decimal_precision {
+    my ($self, $code) = @_;
+
+    $code ||= $self->code;
+    my $format;
+
+    ## funky eval to get string versions of constants back into the values
+    eval '$format = Locale::Currency::Format::' .  $self->format;
+
+    if(! is_CurrencyCode($code)) {
+        Data::Money::Exception->throw(error => 'Invalid currency code:  ' . ($code || 'undef'));
+    }
+
+    return Locale::Currency::Format::decimal_precision($code) || 0;
+}
+
+
 # Liberally jacked from Math::Currency
 
 sub as_float {
     my ($self) = @_;
 
-    return $self->value->copy->bfround(-2)->bstr;
+    return $self->value->copy->bfround(0 - $self->_decimal_precision)->bstr;
 }
 
 # Liberally jacked from Math::Currency
@@ -271,7 +302,7 @@ sub three_way_compare {
     if($self->code ne $y->code) {
         Data::Money::Exception->throw(error => 'unable to compare different currency types');
     }
-    return $self->value->copy->bfround(-2) <=> $y->value->copy->bfround(-2);
+    return $self->value->copy->bfround(0 - $self->_decimal_precision) <=> $y->value->copy->bfround(0 - $self->_decimal_precision);
 }
 
 
