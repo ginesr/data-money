@@ -73,7 +73,7 @@ OPERATOR OVERLOADING
 
     -   Handled by the "subtract" method. Returns a new Data::Money object.
 
-    *   Handled by the "multiply" method. Returns a new Data::Money object.
+     *  Handled by the "multiply" method. Returns a new Data::Money object.
 
     /   Handled by the "divide" method. Returns a new Data::Money object.
 
@@ -208,6 +208,10 @@ ACKNOWLEDGEMENTS
     Major contributions (more overloaded operators, disallowing operations
     on mismatched currences, absolute value, negation and unit tests) from
     Andrew Nelson "<anelson@cpan.org>".
+
+    Major contributions (more overloaded operators, disallowing operations
+    on mismatched currences, absolute value, negation and unit tests) from
+    Andrew Nelson.
 
 AUTHOR
     Cory G Watson, "<gphat at cpan.org>"
